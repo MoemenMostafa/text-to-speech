@@ -116,7 +116,7 @@ public class TextToSpeech
         text = call.getString("text");
       }
 
-      if (!isStringValid(call.getString("language"))) {
+      if (!isStringValid(call.getString("locale"))) {
         language = "en";
         country = "US";
       } else {
