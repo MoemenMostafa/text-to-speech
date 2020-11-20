@@ -21,6 +21,7 @@ import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
@@ -66,6 +67,11 @@ public class TextToSpeech
         }
 
         ttsInitialized = true;
+
+        Set<Locale> supportedLanguages = tts.getAvailableLanguages();
+        if (supportedLanguages != null) {
+          supportedLangs.addAll(supportedLanguages);
+        }
       }
     } catch (Exception ex) {
       Log.d(
@@ -85,12 +91,7 @@ public class TextToSpeech
     try {
       context = getContext();
       supportedLangs = new ArrayList<>();
-      tts = new android.speech.tts.TextToSpeech(context, this);
-
-      Set<Locale> supportedLanguages = tts.getAvailableLanguages();
-      if (supportedLanguages != null) {
-        supportedLangs.addAll(supportedLanguages);
-      }
+      this.tts = new android.speech.tts.TextToSpeech(context, this);
     } catch (Exception ex) {
       Log.d(
         TAG,
@@ -103,7 +104,8 @@ public class TextToSpeech
   public void speak(final PluginCall call) {
     try {
       String text;
-      String locale;
+      String language;
+      String country;
       double speechRate;
       double volume;
       double pitchRate;
@@ -115,15 +117,16 @@ public class TextToSpeech
         text = call.getString("text");
       }
 
-      if (!call.hasOption("text") || !isStringValid(call.getString("locale"))) {
-        locale = "en-US";
+      if (!isStringValid(call.getString("language"))) {
+        language = "en";
+        country = "US";
       } else {
-        locale = call.getString("locale");
-
-        if (!supportedLangs.contains(new Locale(locale))) {
-          call.error(ERROR_UNSUPPORTED_LOCALE);
-          return;
-        }
+        language = call.getString("language");
+        country = call.getString("country");
+      }
+      if (!supportedLangs.contains(new Locale(language, country))) {
+        call.error(ERROR_UNSUPPORTED_LOCALE);
+        return;
       }
 
       if (!call.hasOption("rate") || !isStringValid(call.getString("rate"))) {
@@ -190,7 +193,7 @@ public class TextToSpeech
           volume
         );
 
-        tts.setLanguage(new Locale(locale));
+        tts.setLanguage(new Locale(language,country));
         tts.setSpeechRate((float) speechRate);
         tts.setPitch((float) pitchRate);
         tts.speak(
@@ -210,7 +213,7 @@ public class TextToSpeech
           Double.toString(volume)
         );
 
-        tts.setLanguage(new Locale(locale));
+        tts.setLanguage(new Locale(language,country));
         tts.setPitch((float) pitchRate);
         tts.speak(text, android.speech.tts.TextToSpeech.QUEUE_FLUSH, ttsParams);
       }
