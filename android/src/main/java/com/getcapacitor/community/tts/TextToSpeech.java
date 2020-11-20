@@ -121,8 +121,8 @@ public class TextToSpeech
         language = "en";
         country = "US";
       } else {
-        language = call.getString("language");
-        country = call.getString("country");
+        language = call.getString("locale").split("_")[0];
+        country = call.getString("locale").split("_")[1];
       }
       if (!supportedLangs.contains(new Locale(language, country))) {
         call.error(ERROR_UNSUPPORTED_LOCALE);
