@@ -9,7 +9,11 @@
     "clean": "rimraf ./dist",
     "watch": "tsc --watch",
     "prepublishOnly": "npm run build",
-    "npm-publish": "np"
+    "release:patch": "standard-version release --release-as patch",
+    "release:minor": "standard-version release --release-as minor",
+    "release:major": "standard-version release --release-as major",
+    "contributors:add": "all-contributors add",
+    "contributors:gen": "all-contributors generate"
   },
   "author": "Priyank Patel <priyank.patel@stackspace.ca>",
   "license": "MIT",
